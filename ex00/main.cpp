@@ -3,12 +3,21 @@
 
 BitcoinExchange read_data(std::ifstream & inf)
 {
+  int counter;
   std::string strInput;
   BitcoinExchange btc;
 
+  counter = 0;
   while(std::getline(inf, strInput))
   {
+    if (counter++ == 0)
+    {
+      if (strInput == "date | value")
+        continue;
+      throw (BitcoinExchange::InvalidHeader());
+    }
     std::cout << strInput << '\n';
+    btc.readEntry(strInput);
   }
   return (btc);
 }

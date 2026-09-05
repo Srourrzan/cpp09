@@ -15,8 +15,9 @@ public:
 	BitcoinExchange( const BitcoinExchange & );
 	BitcoinExchange( const std::map<std::string, int> );
 	BitcoinExchange & operator=( const BitcoinExchange & );
-	int readEntry( std::string );
+	void readEntry( const std::string );
 	void addEntry( std::string, int );
+	int validateDate( std::string );
 
 	class FileCannotLoad: public std::exception
 	{
@@ -27,7 +28,14 @@ public:
 		}
 	};
 
-  
+	class InvalidHeader: public std::exception
+	{
+		public:
+		virtual const char* what() const throw()
+		{
+			return ("Incorrect file header\n");
+		}
+	};
 
 private:
 	std::map<std::string, int> _data;
