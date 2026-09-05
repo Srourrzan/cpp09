@@ -1,15 +1,26 @@
 #include <fstream>
 #include "BitcoinExchange.hpp"
 
-void read_file(char *file_name)
+BitcoinExchange read_data(std::ifstream & inf)
 {
-  std::cout << "file name: " 
-  << file_name
-  << std::endl;
+  std::string strInput;
+  BitcoinExchange btc;
+
+  while(std::getline(inf, strInput))
+  {
+    std::cout << strInput << '\n';
+  }
+  return (btc);
+}
+
+void parse_file(char *file_name)
+{
+  BitcoinExchange btc;
 
   std::ifstream inf(file_name);
   if (!inf)
     throw(BitcoinExchange::FileCannotLoad());
+  btc = read_data(inf);
   return ;
 }
 
@@ -33,7 +44,7 @@ int main(int argc, char **argv)
   if (validate_parameters(argc) < 0)
     return (1);
   try {
-    read_file(argv[1]);
+    parse_file(argv[1]);
 
   } catch (std::exception & e) {
     std::cout << e.what() << std::endl;
