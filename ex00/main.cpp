@@ -1,35 +1,11 @@
-#include <fstream>
 #include "BitcoinExchange.hpp"
-
-BitcoinExchange read_data(std::ifstream & inf)
-{
-  int counter;
-  std::string strInput;
-  BitcoinExchange btc;
-
-  counter = 0;
-  while(std::getline(inf, strInput))
-  {
-    if (counter++ == 0)
-    {
-      if (strInput == "date | value")
-        continue;
-      throw (BitcoinExchange::InvalidHeader());
-    }
-    std::cout << strInput << '\n';
-    btc.readEntry(strInput);
-  }
-  return (btc);
-}
 
 void parse_file(char *file_name)
 {
-  BitcoinExchange btc;
-
   std::ifstream inf(file_name);
   if (!inf)
     throw(BitcoinExchange::FileCannotLoad());
-  btc = read_data(inf);
+  BitcoinExchange::read_data(inf, 0);
   return ;
 }
 
@@ -37,7 +13,7 @@ int validate_parameters( int argc )
 {
   if(argc < 2)
   {
-    std::cerr << "provide database file in csv format\n";
+    std::cerr << "Error: could not open file.\n";
     return (-1);
   }
   if (argc > 2)
@@ -50,11 +26,13 @@ int validate_parameters( int argc )
 
 int main(int argc, char **argv)
 {
+  BitcoinExchange btc;
+
   if (validate_parameters(argc) < 0)
     return (1);
   try {
+    btc = BitcoinExchange::loadDatabase( );
     parse_file(argv[1]);
-
   } catch (std::exception & e) {
     std::cout << e.what() << std::endl;
   }

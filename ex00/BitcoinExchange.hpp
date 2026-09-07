@@ -2,7 +2,10 @@
 # define BITCOINEXCHANGE_HPP
 
 # include <map>
+# include <cctype>
 # include <string>
+# include <fstream>
+# include <sstream>
 # include <iostream>
 # include <algorithm>
 # include <exception>
@@ -15,9 +18,17 @@ public:
 	BitcoinExchange( const BitcoinExchange & );
 	BitcoinExchange( const std::map<std::string, int> );
 	BitcoinExchange & operator=( const BitcoinExchange & );
-	void readEntry( const std::string );
-	void addEntry( std::string, int );
-	int validateDate( std::string );
+	int 						rangeValid( int, int, int );
+	void 						readEntry( const std::string );
+	static 					BitcoinExchange loadDatabase( );
+	float 					stringToFlt( const std::string );
+	float 					validateVal( const std::string );
+	int 						validateDate( const std::string );
+	void 						validateEntry( const std::string );
+	// void 						addEntry( const std::string, float );
+	static BitcoinExchange read_data(std::ifstream &, int );
+	int 						indicateError( const std::string, const std::string );
+
 
 	class FileCannotLoad: public std::exception
 	{
