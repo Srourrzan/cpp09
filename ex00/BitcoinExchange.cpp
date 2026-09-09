@@ -1,4 +1,5 @@
 #include "BitcoinExchange.hpp"
+#include <iostream>
 
 BitcoinExchange::BitcoinExchange( )
 : _data( )
@@ -11,7 +12,7 @@ BitcoinExchange::BitcoinExchange( const BitcoinExchange & src )
 : _data(src._data)
 {}
 
-BitcoinExchange::BitcoinExchange( const std::map<std::string, int> data )
+BitcoinExchange::BitcoinExchange( const std::map<std::string, float> data )
 : _data(data)
 {}
 
@@ -22,9 +23,24 @@ BitcoinExchange & BitcoinExchange::operator=( const BitcoinExchange & rhs )
 	return (*this);
 }
 
+void BitcoinExchange::evaluateData( const std::string date, float val )
+{
+  std::map<std::string, float>::iterator it = _data.upper_bound(date);
+  if (it != _data.end()) {
+    --it;
+    std::cout << date
+			  << " => "
+              << it->second
+			  << " = "
+              << val * it->second
+			  << "\n";
+  }
+}
+
 void BitcoinExchange::validateEntry( const std::string val )
 {
-	size_t position;
+  size_t position;
+  float fltVal;
 	std::string valStr;
 	std::string dateStr;
 
@@ -42,9 +58,12 @@ void BitcoinExchange::validateEntry( const std::string val )
 		return ;
 	}
 	if (validateDate(dateStr) < 0)
-		return ;
-	if (validateVal(valStr) < 0)
-		return ;
+          return;
+	fltVal = validateVal(valStr);
+	if (fltVal < 0)
+          return;
+	std::cout << "validating date: " << dateStr << "\n";
+	evaluateData(dateStr, fltVal);
 	return;
 }
 
@@ -109,14 +128,14 @@ int BitcoinExchange::rangeValid( int val, int min, int max )
 
 float BitcoinExchange::validateVal( const std::string val )
 {
-	float intVal;
+	float fltVal;
 
-	intVal = stringToFlt(val);
-	if (intVal < 0)
+	fltVal = stringToFlt(val);
+	if (fltVal < 0)
 		return(indicateError("not a positive number.", ""));
-	if (intVal > 1000)
+	if (fltVal > 1000)
 		return(indicateError("too large a number.", ""));
-	return (0);
+	return (fltVal);
 }
 
 BitcoinExchange BitcoinExchange::loadDatabase( )
@@ -148,6 +167,7 @@ BitcoinExchange BitcoinExchange::read_data(std::ifstream & inf, int type )
   BitcoinExchange btc;
 
   counter = 0;
+  std::cout << "type: " << type << "\n";
   while(std::getline(inf, strInput))
   {
     if (counter++ == 0)
@@ -163,7 +183,7 @@ BitcoinExchange BitcoinExchange::read_data(std::ifstream & inf, int type )
 			continue;
 		}
 		else
-    	btc.readEntry(strInput);
+		  btc.readEntry(strInput);
   }
   return (btc);
 }

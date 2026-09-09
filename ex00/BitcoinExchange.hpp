@@ -13,21 +13,21 @@
 class BitcoinExchange
 {
 public:
-	BitcoinExchange( );
-	~BitcoinExchange( );
-	BitcoinExchange( const BitcoinExchange & );
-	BitcoinExchange( const std::map<std::string, int> );
-	BitcoinExchange & operator=( const BitcoinExchange & );
-	int 						rangeValid( int, int, int );
-	void 						readEntry( const std::string );
-	static 					BitcoinExchange loadDatabase( );
-	float 					stringToFlt( const std::string );
-	float 					validateVal( const std::string );
-	int 						validateDate( const std::string );
-	void 						validateEntry( const std::string );
-	// void 						addEntry( const std::string, float );
-	static BitcoinExchange read_data(std::ifstream &, int );
-	int 						indicateError( const std::string, const std::string );
+  BitcoinExchange( );
+  ~BitcoinExchange( );
+  BitcoinExchange( const BitcoinExchange & );
+  BitcoinExchange( const std::map<std::string, float> );
+  BitcoinExchange & operator=( const BitcoinExchange & );
+  int rangeValid( int, int, int );
+  void readEntry( const std::string );
+  int validateDate( const std::string );
+  static BitcoinExchange loadDatabase( );
+  float validateVal( const std::string );
+  float stringToFlt( const std::string );
+  void validateEntry( const std::string );
+  void evaluateData( const std::string, float );
+  static BitcoinExchange read_data(std::ifstream &, int );
+  int indicateError( const std::string, const std::string );
 
 
 	class FileCannotLoad: public std::exception
@@ -49,7 +49,7 @@ public:
 	};
 
 private:
-	std::map<std::string, int> _data;
+	std::map<std::string, float> _data;
 };
 
 #endif
