@@ -30,7 +30,7 @@ void BitcoinExchange::evaluateData( const std::string date, float val )
     --it;
     std::cout << date
 			  << " => "
-              << it->second
+              << val
 			  << " = "
               << val * it->second
 			  << "\n";
@@ -62,7 +62,6 @@ void BitcoinExchange::validateEntry( const std::string val )
 	fltVal = validateVal(valStr);
 	if (fltVal < 0)
           return;
-	std::cout << "validating date: " << dateStr << "\n";
 	evaluateData(dateStr, fltVal);
 	return;
 }
@@ -138,17 +137,6 @@ float BitcoinExchange::validateVal( const std::string val )
 	return (fltVal);
 }
 
-BitcoinExchange BitcoinExchange::loadDatabase( )
-{
-	BitcoinExchange btc;
-
-	std::ifstream inf("data.csv");
-	if (!inf)
-		throw(BitcoinExchange::FileCannotLoad());
-	btc = read_data(inf, 1);
-	return (btc);
-}
-
 void BitcoinExchange::readEntry( const std::string str)
 {
 	std::string dateStr;
@@ -160,30 +148,3 @@ void BitcoinExchange::readEntry( const std::string str)
 	return ;
 }
 
-BitcoinExchange BitcoinExchange::read_data(std::ifstream & inf, int type )
-{
-  int counter;
-  std::string strInput;
-  BitcoinExchange btc;
-
-  counter = 0;
-  std::cout << "type: " << type << "\n";
-  while(std::getline(inf, strInput))
-  {
-    if (counter++ == 0)
-    {
-      if ((strInput == "date | value" && type == 0)
-				|| (strInput == "date,exchange_rate" && type == 1))
-        continue;
-      throw (BitcoinExchange::InvalidHeader());
-    }
-		if (type == 0)
-		{
-			btc.validateEntry(strInput);
-			continue;
-		}
-		else
-		  btc.readEntry(strInput);
-  }
-  return (btc);
-}
