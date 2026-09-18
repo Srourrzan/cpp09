@@ -2,38 +2,31 @@
 #include <iostream>
 
 RPN::RPN()
-    : _data(),
-	  _valFlag(1)
+    : _data()
 {}
 
 RPN::~RPN( ) {}
 
 RPN::RPN(const RPN &src)
-    : _data(src._data),
-	  _valFlag(1)
+    : _data(src._data)
 {}
 
 RPN::RPN(const std::string &ipt)
-    : _data(),
-	  _valFlag(1)
+    : _data()
 {
   std::stringstream ss(ipt);
   std::string token;
 
   while (ss >> token) {
     if (token.length() != 1) {
-      _valFlag = 0;
-	  break;
+      throw (RPNError());
     }
     if (isDigit(token[0])) {
       _data.push(strToFlt(token));
     } else if (isOperator(token[0])) {
       evaluation(token[0]);
-      if (!_valFlag)
-		return ;
     } else {
-      _valFlag = 0;
-	  return ;
+      throw (RPNError());
     }
   }
 }
@@ -78,19 +71,13 @@ int RPN::getLength( ) {
   return (_data.size());
 }
 
-int RPN::getValFlag( ) {
-  return (_valFlag);
-}
-
 void RPN::evaluation( char op ) {
   float left;
   float right;
   float result;
   
   if (_data.size() < 2) {
-    std::cerr << "Error\n";
-    _valFlag = 0;
-    return;
+    throw (RPNError());
   }
   right = getValue();
   left = getValue();
@@ -102,9 +89,7 @@ void RPN::evaluation( char op ) {
     result = right * left;
   else {
     if (right == 0) {
-      std::cerr << "Error\n";
-      _valFlag = 0;
-	  return ;
+      throw (RPNError());
     }
 	result = left / right;
   }
@@ -117,4 +102,8 @@ float RPN::strToFlt( const std::string& str ) {
 
   ss >> f;
   return (f);
+}
+
+const char *RPN::RPNError::what() const throw() {
+  return ("Error\n");
 }

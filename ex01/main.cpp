@@ -1,5 +1,7 @@
 #include "RPN.hpp"
 #include <cctype>
+#include <exception>
+#include <iostream>
 
 int main(int argc, char *argv[]) {
   RPN rpn;
@@ -8,13 +10,15 @@ int main(int argc, char *argv[]) {
     std::cerr << "Error" << "\n";
 	return (1);
   }
+  try {	
   rpn = RPN(argv[1]);
-  if (!rpn.getValFlag())
-    return (1);
   if (rpn.getLength() != 1) {
     std::cerr << "Error" << "\n";
 	return (2);
   }
   rpn.debug();
+  } catch (const std::exception& e) {
+	std::cerr << e.what();
+  }
   return (0);
 }
