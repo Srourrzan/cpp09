@@ -6,7 +6,8 @@ int main(int argc, char *argv[]) {
 
   try {
 	pm.parseInput(argc, argv);
-	std::cout << "Before " << pm << "\n";
+        std::cout << "Before " << pm << "\n";
+		pm.sortByVector();
   } catch (const std::exception &e) {
 	std::cerr << e.what();
   }

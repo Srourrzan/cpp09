@@ -1,4 +1,6 @@
 #include "PmergeMe.hpp"
+#include <iostream>
+#include <vector>
 
 PmergeMe::PmergeMe( )
   : _data()
@@ -55,6 +57,78 @@ bool PmergeMe::isValidPositiveInt( const std::string &str, int &res )
   if (res < 0)
 	return (false);
   return (true);
+}
+
+void PmergeMe::simpleSort( std::vector<Pair> & pairs ) {
+  if (pairs.size() <= 1)
+    return ;
+  if (pairs.size() == 2) {
+    if (pairs[0].winner > pairs[1].winner)
+      std::swap(pairs[0], pairs[1]);
+	return ;
+  }
+  if (pairs[0].winner > pairs[1].winner)
+    std::swap(pairs[0], pairs[1]);
+  if (pairs[1].winner > pairs[2].winner)
+	std::swap(pairs[1], pairs[2]);
+}
+
+void PmergeMe::fordJohnsonSort( std::vector<Pair> & pairs ) {
+  if (pairs.size() <= 3) {
+    simpleSort(pairs);
+	return ;
+  }
+  std::vector<Pair> mainChainWinners;
+  std::vector<Pair> mainChainLosers;
+  // logic to seperate them based on comparing
+  // pairs[i].winner and pairs[i + 1].winner
+  fordJohnsonSort(mainChainWinners);
+  // Insert the loasing Pairs into mainChainWinners using Jacobsthal
+  // sequence (Comparison during insertion still uses the 'winner' attribute)
+
+  pairs = mainChainWinners;
+}
+
+void PmergeMe::sortByVector( ) {
+  Pair p;
+  int first;
+  int second;
+  int unpaired;
+  std::vector<Pair> pairs;
+
+  unpaired = -1;
+  for (size_t i = 0; i < _data.size(); i += 2) {
+    if (i + 1 < _data.size()) {
+      first = _data[i];
+      second = _data[i + 1];
+      if (first < second) {
+        p.loser = first;
+		p.winner = second;
+      } else {
+        p.loser = second;
+		p.winner = first;
+      }
+	  pairs.push_back(p);
+    } else {
+	  unpaired = _data[i];
+    }
+  }
+  fordJohnsonSort(pairs);
+    for (unsigned long int i = 0; i < pairs.size(); i++)
+	{
+	  if (i > 0)
+		std::cout << " ";
+	  std::cout << pairs[i].winner;
+    }
+    std::cout << "\n";
+	for (unsigned long int i = 0; i < pairs.size(); i++)
+	{
+	  if (i > 0)
+		std::cout << " ";
+	  std::cout << pairs[i].loser;
+    }
+    std::cout << "\n";
+    std::cout << "unpaired " << unpaired << "\n";
 }
 
 const char* PmergeMe::PmergeMeError::what() const throw()
