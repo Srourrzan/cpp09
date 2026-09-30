@@ -59,7 +59,7 @@ bool PmergeMe::isValidPositiveInt( const std::string &str, int &res )
   return (true);
 }
 
-void PmergeMe::simpleSort( std::vector<Pair> & pairs ) {
+void PmergeMe::simpleSortVectors( std::vector<Pair> & pairs ) {
   if (pairs.size() <= 1)
     return ;
   if (pairs.size() == 2) {
@@ -73,20 +73,72 @@ void PmergeMe::simpleSort( std::vector<Pair> & pairs ) {
 	std::swap(pairs[1], pairs[2]);
 }
 
-void PmergeMe::fordJohnsonSort( std::vector<Pair> & pairs ) {
+void PmergeMe::fordJohnsonSortVectors( std::vector<Pair> & pairs ) {
   if (pairs.size() <= 3) {
-    simpleSort(pairs);
+    simpleSortVectors(pairs);
 	return ;
   }
   std::vector<Pair> mainChainWinners;
   std::vector<Pair> mainChainLosers;
-  // logic to seperate them based on comparing
-  // pairs[i].winner and pairs[i + 1].winner
-  fordJohnsonSort(mainChainWinners);
+  // std::cout << "info 2\n";
+  for (size_t i = 0; i < pairs.size(); i += 2) {
+	if (i + 1 < pairs.size()) {
+	  if (pairs[i].winner > pairs[i + 1].winner) {
+		mainChainWinners.push_back(pairs[i]);
+		mainChainLosers.push_back(pairs[i + 1]);
+	  } else {
+		mainChainWinners.push_back(pairs[i + 1]);
+		mainChainLosers.push_back(pairs[i]);
+	  }
+	} else {
+	  mainChainWinners.push_back(pairs[i]);
+	}
+  }
+  fordJohnsonSortVectors(mainChainWinners);
   // Insert the loasing Pairs into mainChainWinners using Jacobsthal
   // sequence (Comparison during insertion still uses the 'winner' attribute)
-
+  //std::cout << "info 3\n";
+  insertLosersVectors(mainChainWinners, mainChainLosers);
+  //std::cout << "info 4\n";
   pairs = mainChainWinners;
+}
+
+std::vector<int> PmergeMe::generateJacobsthalVectors( int size )
+{
+  int j0;
+  int j1;
+  int next;
+  std::vector<int> jacob;
+  
+  if (size <= 0)
+	return jacob;
+
+  j0 = 0;
+  j1 = 1;
+  jacob.push_back(j1);
+  //std::cout << "info 6\n";
+  while(j1 < size)
+	{
+	  next = j1 + 2 * j0;
+	  j0 = j1;
+	  j1 = next;
+	  if (j1 <= size)
+		jacob.push_back(j1);
+	}
+  //std::cout << "info 7\n";
+  return (jacob);
+}
+
+void PmergeMe::insertLosersVectors( std::vector<Pair> & mainChainWinners, std::vector<Pair> & mainChainLosers )
+{
+  std::vector<int> jacobChain;
+
+  (void)mainChainWinners;
+  //std::cout << "info 5\n";
+  jacobChain = generateJacobsthalVectors(mainChainLosers.size());
+  //std::cout << "info 8\n";
+  std::cout << "JacobChain: " << jacobChain << "\n";
+  //std::cout << "info 9\n";
 }
 
 void PmergeMe::sortByVector( ) {
@@ -113,20 +165,10 @@ void PmergeMe::sortByVector( ) {
 	  unpaired = _data[i];
     }
   }
-  fordJohnsonSort(pairs);
-    for (unsigned long int i = 0; i < pairs.size(); i++)
-	{
-	  if (i > 0)
-		std::cout << " ";
-	  std::cout << pairs[i].winner;
-    }
-    std::cout << "\n";
-	for (unsigned long int i = 0; i < pairs.size(); i++)
-	{
-	  if (i > 0)
-		std::cout << " ";
-	  std::cout << pairs[i].loser;
-    }
+  // std::cout << "info 1\n";
+  fordJohnsonSortVectors(pairs);
+    
+  std::cout << pairs;
     std::cout << "\n";
     std::cout << "unpaired " << unpaired << "\n";
 }
@@ -144,5 +186,35 @@ std::ostream & operator<<( std::ostream &os, const PmergeMe &src )
 		os << " ";
 	  os << src.getData()[i];
 	}
+  return (os);
+}
+
+std::ostream & operator<<( std::ostream &os, const std::vector<Pair> & pairs )
+{
+  os << "winners: \n";
+  for (unsigned long int i = 0; i < pairs.size(); i++)
+	{
+	  if (i > 0)
+		os << " ";
+	  os << pairs[i].winner;
+    }
+  os << "\nlosers: \n";
+  for (unsigned long int i = 0; i < pairs.size(); i++)
+	{
+	  if (i > 0)
+		os << " ";
+	  os << pairs[i].loser;
+    }
+  return (os);
+}
+
+std::ostream & operator<<( std::ostream &os, const std::vector<int> & vect )
+{
+  for (unsigned long int i = 0; i < vect.size(); i++)
+	{
+	  if (i > 0)
+		os << " ";
+	  os << vect[i];
+    }
   return (os);
 }

@@ -1,9 +1,9 @@
 #ifndef PMERGEME_HPP
 #define PMERGEME_HPP
 
-#include <cstddef>
 #include <string>
 #include <vector>
+#include <cstddef>
 #include <sstream>
 #include <iostream>
 #include <exception>
@@ -19,13 +19,17 @@ public:
   ~PmergeMe( );
   PmergeMe( const PmergeMe & );
   PmergeMe &operator=( const PmergeMe & );
-  void sortByVector( );
+  
   std::vector<int> getData( ) const;
   void parseInput( int, char *argv[] );
-  void simpleSort( std::vector<Pair> & );
-  void seperateVectors( std::vector<Pair> & );
-  void fordJohnsonSort( std::vector<Pair> & );
   bool isValidPositiveInt( const std::string &, int & );
+  
+  void sortByVector( );
+  void seperateVectors( std::vector<Pair> & );
+  void simpleSortVectors( std::vector<Pair> & );
+  void fordJohnsonSortVectors( std::vector<Pair> & );
+  std::vector<int> generateJacobsthalVectors( int );
+  void insertLosersVectors( std::vector<Pair> & , std::vector<Pair> & );
 
   class PmergeMeError : public std::exception {
   public:
@@ -37,5 +41,7 @@ private:
 };
 
 std::ostream & operator<<( std::ostream &, const PmergeMe & );
+std::ostream & operator<<( std::ostream &, const std::vector<int> & );
+std::ostream & operator<<( std::ostream &, const std::vector<Pair> & );
 
 #endif
