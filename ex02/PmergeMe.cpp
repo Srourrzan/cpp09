@@ -1,6 +1,8 @@
 #include "PmergeMe.hpp"
-#include <iostream>
-#include <vector>
+#include <cstddef>
+#include <iterator>
+#include <utility>
+#include <algorithm>
 
 PmergeMe::PmergeMe( )
   : _data()
@@ -54,126 +56,155 @@ bool PmergeMe::isValidPositiveInt( const std::string &str, int &res )
 	return (false);
   if (ss >> extra)
 	return (false);
-  if (res < 0)
+  if (res <= 0)
 	return (false);
   return (true);
 }
 
-void PmergeMe::simpleSortVectors( std::vector<Pair> & pairs ) {
-  if (pairs.size() <= 1)
+// VECTOR ALGO
+
+void PmergeMe::simpleSortVectors( std::vector<int> & vect ) const{
+  if (vect.size() <= 1)
     return ;
-  if (pairs.size() == 2) {
-    if (pairs[0].winner > pairs[1].winner)
-      std::swap(pairs[0], pairs[1]);
+  if (vect.size() == 2) {
+    if (vect[0] > vect[1])
+      std::swap(vect[0], vect[1]);
 	return ;
   }
-  if (pairs[0].winner > pairs[1].winner)
-    std::swap(pairs[0], pairs[1]);
-  if (pairs[1].winner > pairs[2].winner)
-	std::swap(pairs[1], pairs[2]);
+  if (vect[0] > vect[1])
+    std::swap(vect[0], vect[1]);
+  if (vect[1] > vect[2])
+    std::swap(vect[1], vect[2]);
+  if (vect[0] > vect[1])
+    std::swap(vect[0], vect[1]);
 }
 
-void PmergeMe::fordJohnsonSortVectors( std::vector<Pair> & pairs ) {
-  if (pairs.size() <= 3) {
-    simpleSortVectors(pairs);
-	return ;
-  }
-  std::vector<Pair> mainChainWinners;
-  std::vector<Pair> mainChainLosers;
-  // std::cout << "info 2\n";
-  for (size_t i = 0; i < pairs.size(); i += 2) {
-	if (i + 1 < pairs.size()) {
-	  if (pairs[i].winner > pairs[i + 1].winner) {
-		mainChainWinners.push_back(pairs[i]);
-		mainChainLosers.push_back(pairs[i + 1]);
-	  } else {
-		mainChainWinners.push_back(pairs[i + 1]);
-		mainChainLosers.push_back(pairs[i]);
-	  }
-	} else {
-	  mainChainWinners.push_back(pairs[i]);
-	}
-  }
-  fordJohnsonSortVectors(mainChainWinners);
-  // Insert the loasing Pairs into mainChainWinners using Jacobsthal
-  // sequence (Comparison during insertion still uses the 'winner' attribute)
-  //std::cout << "info 3\n";
-  insertLosersVectors(mainChainWinners, mainChainLosers);
-  //std::cout << "info 4\n";
-  pairs = mainChainWinners;
-}
-
-std::vector<int> PmergeMe::generateJacobsthalVectors( int size )
-{
-  int j0;
-  int j1;
+std::vector<int> PmergeMe::generateJacobsthalVectors(int size) const {
+  int a0;
+  int a1;
   int next;
   std::vector<int> jacob;
-  
-  if (size <= 0)
-	return jacob;
 
-  j0 = 0;
-  j1 = 1;
-  jacob.push_back(j1);
-  //std::cout << "info 6\n";
-  while(j1 < size)
-	{
-	  next = j1 + 2 * j0;
-	  j0 = j1;
-	  j1 = next;
-	  if (j1 <= size)
-		jacob.push_back(j1);
-	}
-  //std::cout << "info 7\n";
+  if (size <= 0)
+    return (jacob);
+  a0 = 1;
+  a1 = 3;
+  jacob.push_back(a0);
+  while (a1 <= size) {
+    jacob.push_back(a1);
+    next = a1 + 2 * a0;
+    a0 = a1;
+	a1 = next;
+  }
+  if (jacob.back() < size) {
+	jacob.push_back(a1);
+  }
   return (jacob);
 }
 
-void PmergeMe::insertLosersVectors( std::vector<Pair> & mainChainWinners, std::vector<Pair> & mainChainLosers )
-{
-  std::vector<int> jacobChain;
+void PmergeMe::binaryInsertVectors(std::vector<Pair> &pairs,
+                                   std::vector<int> &winners, int g) const {
+  size_t low;
+  size_t mid;
+  size_t high;
+  int loser_val;
+  int winner_val;
+  // size_t upper_bound_idx;
+  std::vector<int>::iterator it;
 
-  (void)mainChainWinners;
-  //std::cout << "info 5\n";
-  jacobChain = generateJacobsthalVectors(mainChainLosers.size());
-  //std::cout << "info 8\n";
-  std::cout << "JacobChain: " << jacobChain << "\n";
-  //std::cout << "info 9\n";
+  low = 0;
+  loser_val = pairs[g].loser;
+  winner_val = pairs[g].winner;
+  it = std::find(winners.begin(), winners.end(), winner_val);
+  high = std::distance(winners.begin(), it);
+  while (low < high) {
+    mid = low + (high - low) / 2;
+    if (winners[mid] < loser_val)
+      low = mid + 1;
+    else
+	  high = mid;
+  }
+  winners.insert(winners.begin() + low, loser_val);
 }
 
-void PmergeMe::sortByVector( ) {
+void PmergeMe::insertLosersVectors(std::vector<Pair> &pairs,
+                                   std::vector<int> &winners) const {
+  size_t group_end;
+  size_t group_start;
+  std::vector<int> jacob;
+
+  group_start = 0;
+  jacob = generateJacobsthalVectors(pairs.size());
+  for (size_t i = 0; i < jacob.size(); ++i) {
+    group_end = jacob[i];
+    if (group_end > pairs.size()) {
+	  group_end = pairs.size();
+    }
+
+    for (int g = static_cast<int>(group_end) - 1;
+         g >= static_cast<int>(group_start); --g) {
+	  binaryInsertVectors(pairs, winners, g);
+    }
+	group_start = group_end;
+  }
+}
+
+std::vector<int>
+PmergeMe::fordJohnsonSortVectors(std::vector<int> &vect) const {
   Pair p;
-  int first;
-  int second;
   int unpaired;
   std::vector<Pair> pairs;
+  std::vector<int> winners;
 
   unpaired = -1;
-  for (size_t i = 0; i < _data.size(); i += 2) {
-    if (i + 1 < _data.size()) {
-      first = _data[i];
-      second = _data[i + 1];
-      if (first < second) {
-        p.loser = first;
-		p.winner = second;
+  // Base case
+  if (vect.size() <= 3) {
+    simpleSortVectors(vect);
+	return (vect);
+  }
+  // Pairing phase
+  for (size_t i = 0; i < vect.size(); i += 2) {
+    if (i + 1 < vect.size()) {
+      if (vect[i] > vect[i + 1]) {
+        p.winner = vect[i];
+		p.loser = vect[i + 1];
       } else {
-        p.loser = second;
-		p.winner = first;
+        p.winner = vect[i + 1];
+		p.loser = vect[i];
       }
 	  pairs.push_back(p);
     } else {
-	  unpaired = _data[i];
+	  unpaired = vect[i];
     }
   }
-  // std::cout << "info 1\n";
-  fordJohnsonSortVectors(pairs);
-    
-  std::cout << pairs;
-    std::cout << "\n";
-    std::cout << "unpaired " << unpaired << "\n";
+  // Fetch winners
+  for (size_t i = 0; i < pairs.size(); ++i) {
+	winners.push_back(pairs[i].winner);
+  }
+  // Recursive sort
+  fordJohnsonSortVectors(winners);
+  // Insert losers
+  insertLosersVectors(pairs, winners);
+  // Insert unpaired element
+  if (unpaired != -1) {
+    size_t low = 0;
+    size_t high = winners.size();
+    while (low < high) {
+      size_t mid = low + (high - low) / 2;
+      if (winners[mid] < unpaired)
+        low = mid + 1;
+      else
+		high = mid;
+    }
+	winners.insert(winners.begin() + low, unpaired);
+  }
+  vect = winners;
+  return (vect);
 }
 
-const char* PmergeMe::PmergeMeError::what() const throw()
+// END OF VECTOR ALGO
+
+const char* PmergeMe::PmergeMeError::what( ) const throw( )
 {
   return ("Error\n");
 }

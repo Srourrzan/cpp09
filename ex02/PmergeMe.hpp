@@ -3,10 +3,11 @@
 
 #include <string>
 #include <vector>
-#include <cstddef>
 #include <sstream>
 #include <iostream>
 #include <exception>
+
+# define LOG_INFO() std::cout << __FILE__ << ":" << __LINE__ << " " << __func__<< ": ";
 
 struct Pair {
   int winner;
@@ -24,12 +25,12 @@ public:
   void parseInput( int, char *argv[] );
   bool isValidPositiveInt( const std::string &, int & );
   
-  void sortByVector( );
   void seperateVectors( std::vector<Pair> & );
-  void simpleSortVectors( std::vector<Pair> & );
-  void fordJohnsonSortVectors( std::vector<Pair> & );
-  std::vector<int> generateJacobsthalVectors( int );
-  void insertLosersVectors( std::vector<Pair> & , std::vector<Pair> & );
+  void simpleSortVectors( std::vector<int> & ) const;
+  std::vector<int> generateJacobsthalVectors( int ) const;
+  std::vector<int> fordJohnsonSortVectors( std::vector<int> & ) const;
+  void binaryInsertVectors(std::vector<Pair> & , std::vector<int> &, int ) const;
+  void insertLosersVectors(std::vector<Pair> &, std::vector<int> &) const;
 
   class PmergeMeError : public std::exception {
   public:
