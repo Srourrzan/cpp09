@@ -33,19 +33,13 @@ public:
 	class FileCannotLoad: public std::exception
 	{
 		public:
-		virtual const char* what() const throw()
-		{
-			return ("Unable to load input file\n");
-		}
+		virtual const char* what() const throw();
 	};
 
 	class InvalidHeader: public std::exception
 	{
 		public:
-		virtual const char* what() const throw()
-		{
-			return ("Incorrect file header\n");
-		}
+		virtual const char* what() const throw();
 	};
 
 private:

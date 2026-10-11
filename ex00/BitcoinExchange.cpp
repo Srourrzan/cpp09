@@ -148,3 +148,12 @@ void BitcoinExchange::readEntry( const std::string str)
 	return ;
 }
 
+const char* BitcoinExchange::FileCannotLoad::what() const throw()
+{
+	return ("Unable to load input file\n");
+}
+
+const char* BitcoinExchange::InvalidHeader::what() const throw()
+{
+	return ("Incorrect file header\n");
+}

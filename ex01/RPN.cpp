@@ -46,7 +46,7 @@ void RPN::debug( ) {
 }
 
 float RPN::getValue() {
-  float value;
+  float value = 0;
   
   if (!_data.empty()) {
     value = _data.top();
